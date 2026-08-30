@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}Student Registration - Lecturer Review System{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <h2>Student Registration</h2>
+            <p>Create an account to start reviewing lecturers</p>
+        </div>
+
+        <form method="post" action="{{ url_for('student_register') }}">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
+
+            <div class="form-group">
+                <label for="name">Full Name</label>
+                <input type="text" id="name" name="name" class="form-control"
+                       placeholder="Enter your full name" required autofocus>
+            </div>
+
+            <div class="form-group">
+                <label for="student_id">Student ID</label>
+                <input type="text" id="student_id" name="student_id" class="form-control"
+                       placeholder="Registration Number" required>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" class="form-control"
+                       placeholder="your.email@example.com">
+            </div>
+
+            <div class="form-group">
+                <label for="course">Course of Study</label>
+                <select id="course" name="course" class="form-control">
+                    <option value="">Select Course</option>
+                    <option value="BSc. Computer Science">BSc. Computer Science</option>
+                    <option value="BSc. Information Technology">BSc. Information Technology</option>
+                    <option value="BSc. Software Engineering">BSc. Software Engineering</option>
+                    <option value="BSc. Data Science">BSc. Data Science</option>
+                    <option value="BSc. Cyber Security">BSc. Cyber Security</option>
+                    <option value="BSc. Electrical Engineering">BSc. Electrical Engineering</option>
+                    <option value="BSc. Mechanical Engineering">BSc. Mechanical Engineering</option>
+                    <option value="BSc. Civil Engineering">BSc. Civil Engineering</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="year_of_study">Year of Study</label>
+                <select id="year_of_study" name="year_of_study" class="form-control">
+                    <option value="">Select Year</option>
+                    <option value="Year One">Year One</option>
+                    <option value="Year Two">Year Two</option>
+                    <option value="Year Three">Year Three</option>
+                    <option value="Year Four">Year Four</option>
+                    <option value="Year Five">Year Five</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" class="form-control"
+                       placeholder="Create a password (min 6 characters)" required
+                       minlength="6" autocomplete="new-password">
+            </div>
+
+            <div class="form-group">
+                <label for="confirm_password">Confirm Password</label>
+                <input type="password" id="confirm_password" name="confirm_password" class="form-control"
+                       placeholder="Confirm your password" required autocomplete="new-password">
+            </div>
+
+            <button type="submit" class="btn btn-primary">Register</button>
+        </form>
+
+        <div class="auth-link">
+            Already have an account? <a href="{{ url_for('student_login') }}">Log In</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

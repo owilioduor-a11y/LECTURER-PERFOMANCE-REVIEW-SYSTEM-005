@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}Student Dashboard - Lecturer Review System{% endblock %}
+
+{% block content %}
+<div class="main-content">
+    <div class="card">
+        <div class="profile-section">
+            <div class="profile-avatar">{{ student.name[0] }}</div>
+            <div class="profile-info">
+                <h3>Welcome back, {{ student.name }}</h3>
+                <p>{{ student.student_id }} &middot; {{ student.course or 'Student' }}</p>
+            </div>
+        </div>
+    </div>
+
+    {% if lecturers %}
+    <div class="card">
+        <h3 class="mb-2">Lecturers Available for Review</h3>
+        <div class="lecturer-grid">
+            {% for lecturer in lecturers %}
+            <div class="lecturer-card">
+                <div class="profile-section">
+                    <div class="profile-avatar">{{ lecturer.name[0] }}</div>
+                    <div class="profile-info">
+                        <h4>{{ lecturer.name }}</h4>
+                        <p>{{ lecturer.department }}</p>
+                    </div>
+                </div>
+                <a href="{{ url_for('review', lecturer_id=lecturer.id) }}" class="btn btn-primary">
+                    Review
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    {% if reviews %}
+    <div class="card">
+        <h3 class="mb-2">Your Reviews</h3>
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Lecturer</th>
+                        <th>Department</th>
+                        <th>Rating</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for review in reviews %}
+                    <tr>
+                        <td><strong>{{ review.lecturer_name }}</strong></td>
+                        <td>{{ review.lecturer_department }}</td>
+                        <td>
+                            Clarity: {{ review.clarity }}/5<br>
+                            Engagement: {{ review.engagement }}/5<br>
+                            Punctuality: {{ review.punctuality }}/5
+                        </td>
+                        <td style="white-space: nowrap;">{{ review.created_at[:10] }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

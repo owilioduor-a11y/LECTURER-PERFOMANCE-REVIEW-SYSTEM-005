@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}Student Login - Lecturer Review System{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <h2>Student Log In</h2>
+            <p>Log in and start reviewing your lecturers</p>
+        </div>
+
+        <form method="post" action="{{ url_for('student_login') }}">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
+
+            <div class="form-group">
+                <label for="student_id">Student ID Number</label>
+                <input type="text" id="student_id" name="student_id" class="form-control"
+                       placeholder="Enter your registration number" required
+                       autocomplete="username" autofocus>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" class="form-control"
+                       placeholder="Enter your password" required
+                       autocomplete="current-password">
+            </div>
+
+            <button type="submit" class="btn btn-primary">Log In</button>
+        </form>
+
+        <div class="auth-link">
+            Don't have an account? <a href="{{ url_for('student_register') }}">Register</a>
+        </div>
+        <div class="auth-link">
+            <a href="{{ url_for('lecturer_login') }}">Lecturer Login</a> |
+            <a href="{{ url_for('admin_login') }}">Admin Login</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

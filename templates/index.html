@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Lecturer Review System{% endblock %}
+
+{% block content %}
+<div class="main-content">
+    <div class="card">
+        <div class="card-header">
+            <div>
+                <h2>University Lecturer Review System</h2>
+                <p class="text-muted">Select a lecturer to submit your review</p>
+            </div>
+        </div>
+
+        {% if lecturers %}
+        <div class="lecturer-grid">
+            {% for lecturer in lecturers %}
+            <div class="lecturer-card">
+                <div class="profile-section">
+                    <div class="profile-avatar">{{ lecturer.name[0] }}</div>
+                    <div class="profile-info">
+                        <h4>{{ lecturer.name }}</h4>
+                        <p>{{ lecturer.department }}</p>
+                    </div>
+                </div>
+                <a href="{{ url_for('review', lecturer_id=lecturer.id) }}" class="btn btn-primary">
+                    Review This Lecturer
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center" style="padding: 3rem 1rem;">
+            <p class="text-muted">No lecturers available for review at this time.</p>
+            {% if not session.get('is_student') %}
+            <p class="mt-2">
+                <a href="{{ url_for('student_login') }}" class="btn btn-outline">Log in to get started</a>
+            </p>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+
+    {% if not session.get('is_student') and not session.get('is_lecturer') and not session.get('is_admin') %}
+    <div class="card">
+        <h3 class="mb-2">Get Started</h3>
+        <div style="display: flex; flex-wrap: wrap; gap: 0.75rem;">
+            <a href="{{ url_for('student_register') }}" class="btn btn-primary">Register as Student</a>
+            <a href="{{ url_for('student_login') }}" class="btn btn-outline">Student Login</a>
+            <a href="{{ url_for('lecturer_login') }}" class="btn btn-outline">Lecturer Login</a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

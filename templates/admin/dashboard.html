@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - Lecturer Review System{% endblock %}
+
+{% block content %}
+<div class="main-content">
+    <div class="card">
+        <div class="card-header">
+            <div>
+                <h2>Admin Dashboard</h2>
+                <p class="text-muted">Manage lecturers, students, and reviews</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-value">{{ total_students }}</div>
+            <div class="stat-label">Total Students</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">{{ total_lecturers }}</div>
+            <div class="stat-label">Total Lecturers</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">{{ total_reviews }}</div>
+            <div class="stat-label">Total Reviews</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">{{ avg_rating }}</div>
+            <div class="stat-label">Avg Rating</div>
+        </div>
+    </div>
+
+    <!-- Add Lecturer -->
+    <div class="card">
+        <h3 class="mb-2">Add New Lecturer</h3>
+        <form method="post" action="{{ url_for('admin_add_lecturer') }}">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
+            <div style="display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: flex-end;">
+                <div class="form-group" style="flex: 1; min-width: 150px; margin-bottom: 0;">
+                    <label for="name">Name</label>
+                    <input type="text" id="name" name="name" class="form-control" placeholder="Lecturer name" required>
+                </div>
+                <div class="form-group" style="flex: 1; min-width: 150px; margin-bottom: 0;">
+                    <label for="department">Department</label>
+                    <input type="text" id="department" name="department" class="form-control" placeholder="Department" required>
+                </div>
+                <div class="form-group" style="flex: 1; min-width: 150px; margin-bottom: 0;">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" class="form-control" placeholder="Email">
+                </div>
+                <button type="submit" class="btn btn-primary" style="white-space: nowrap;">Add Lecturer</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Export -->
+    <div class="card">
+        <h3 class="mb-2">Export Data</h3>
+        <a href="{{ url_for('export_all_reviews') }}" class="btn btn-outline">Download All Reviews (CSV)</a>
+    </div>
+
+    <!-- Lecturers Table -->
+    <div class="card">
+        <h3 class="mb-2">Lecturers</h3>
+        {% if lecturers %}
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Department</th>
+                        <th>Reviews</th>
+                        <th>Avg Rating</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for lecturer in lecturers %}
+                    <tr>
+                        <td><strong>{{ lecturer.name }}</strong></td>
+                        <td>{{ lecturer.department }}</td>
+                        <td>{{ lecturer.num_reviews }}</td>
+                        <td>{{ lecturer.avg_rating or 'N/A' }}</td>
+                        <td>
+                            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                                <a href="{{ url_for('export_reviews_by_lecturer', lecturer_id=lecturer.id) }}" class="btn btn-outline btn-sm">CSV</a>
+                                <form method="post" action="{{ url_for('admin_deactivate_lecturer', lecturer_id=lecturer.id) }}" style="display: inline;">
+                                    <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
+                                    <button type="submit" class="btn btn-outline btn-sm" data-confirm="Deactivate this lecturer?">Deactivate</button>
+                                </form>
+                                <form method="post" action="{{ url_for('admin_delete_lecturer', lecturer_id=lecturer.id) }}" style="display: inline;">
+                                    <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
+                                    <button type="submit" class="btn btn-danger btn-sm" data-confirm="Permanently delete this lecturer and all their reviews?">Delete</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-muted">No lecturers added yet.</p>
+        {% endif %}
+    </div>
+
+    <!-- Students Table -->
+    {% if students %}
+    <div class="card">
+        <h3 class="mb-2">Registered Students</h3>
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Student ID</th>
+                        <th>Course</th>
+                        <th>Registered</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for s in students %}
+                    <tr>
+                        <td><strong>{{ s.name }}</strong></td>
+                        <td>{{ s.student_id }}</td>
+                        <td>{{ s.course or '-' }}</td>
+                        <td>{{ s.created_at[:10] if s.created_at else '-' }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

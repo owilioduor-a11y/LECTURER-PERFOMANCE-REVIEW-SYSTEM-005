@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>{% block title %}University Lecturer Review System{% endblock %}</title>
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='images/favicon.svg') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    {% block navbar %}
+    <nav class="navbar" aria-label="Primary navigation">
+        <div class="nav-brand">
+            <div class="nav-logo" aria-hidden="true">
+                <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="40" height="40" rx="10" fill="#1f2d46"/>
+                    <path d="M12 28V12h4v6h8V12h4v16h-4v-8h-8v8h-4z" fill="white"/>
+                </svg>
+            </div>
+            <div class="nav-brand-text">
+                <span class="nav-title">Masterui University</span>
+                <span class="nav-subtitle">Lecturer Review Portal</span>
+            </div>
+        </div>
+        <button class="nav-toggle" onclick="toggleMenu()" aria-label="Toggle navigation menu" aria-expanded="false" id="navToggle">
+            <span class="hamburger"></span>
+        </button>
+        <div class="nav-links" id="navLinks">
+            <a href="{{ url_for('index') }}" class="nav-link">Home</a>
+            {% if session.get('is_student') %}
+                <a href="{{ url_for('student_dashboard') }}" class="nav-link">Dashboard</a>
+                <a href="{{ url_for('student_logout') }}" class="nav-link nav-link-outline">Sign Out</a>
+            {% elif session.get('is_lecturer') %}
+                <a href="{{ url_for('lecturer_dashboard') }}" class="nav-link">Dashboard</a>
+                <a href="{{ url_for('lecturer_logout') }}" class="nav-link nav-link-outline">Sign Out</a>
+            {% elif session.get('is_admin') %}
+                <a href="{{ url_for('admin_dashboard') }}" class="nav-link">Dashboard</a>
+                <a href="{{ url_for('admin_logout') }}" class="nav-link nav-link-outline">Sign Out</a>
+            {% else %}
+                <a href="{{ url_for('student_login') }}" class="nav-link">Student Login</a>
+                <a href="{{ url_for('lecturer_login') }}" class="nav-link">Lecturer Login</a>
+                <a href="{{ url_for('admin_login') }}" class="nav-link nav-link-outline">Admin</a>
+            {% endif %}
+        </div>
+    </nav>
+    {% endblock %}
+
+    <!-- Mobile Sidebar -->
+    <aside class="sidebar" id="sidebar" aria-label="Mobile navigation">
+        <div class="sidebar-content">
+            <div class="sidebar-header">
+                <h3>Menu</h3>
+                <button class="close-btn" onclick="toggleMenu()" aria-label="Close menu">&times;</button>
+            </div>
+            <div class="sidebar-links">
+                <a href="{{ url_for('index') }}" class="sidebar-link">Home</a>
+                {% if session.get('is_student') %}
+                    <a href="{{ url_for('student_dashboard') }}" class="sidebar-link">Dashboard</a>
+                    <a href="{{ url_for('student_logout') }}" class="sidebar-link">Sign Out</a>
+                {% elif session.get('is_lecturer') %}
+                    <a href="{{ url_for('lecturer_dashboard') }}" class="sidebar-link">Dashboard</a>
+                    <a href="{{ url_for('lecturer_logout') }}" class="sidebar-link">Sign Out</a>
+                {% elif session.get('is_admin') %}
+                    <a href="{{ url_for('admin_dashboard') }}" class="sidebar-link">Dashboard</a>
+                    <a href="{{ url_for('admin_logout') }}" class="sidebar-link">Sign Out</a>
+                {% else %}
+                    <a href="{{ url_for('student_register') }}" class="sidebar-link">Register</a>
+                    <a href="{{ url_for('student_login') }}" class="sidebar-link">Student Login</a>
+                    <a href="{{ url_for('lecturer_login') }}" class="sidebar-link">Lecturer Login</a>
+                    <a href="{{ url_for('admin_login') }}" class="sidebar-link">Admin Login</a>
+                {% endif %}
+            </div>
+        </div>
+    </aside>
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleMenu()"></div>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="flash-container">
+        {% for category, message in messages %}
+        <div class="flash flash-{{ category }}" role="alert">
+            <span>{{ message }}</span>
+            <button class="flash-close" onclick="this.parentElement.remove()" aria-label="Dismiss">&times;</button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    {% block footer %}
+    <footer class="footer">
+        <div class="footer-content">
+            <p>&copy; {{ current_year }} Masterui University. All rights reserved.</p>
+        </div>
+    </footer>
+    {% endblock %}
+
+    <script src="{{ url_for('static', filename='js/main.js') }}" defer></script>
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>
