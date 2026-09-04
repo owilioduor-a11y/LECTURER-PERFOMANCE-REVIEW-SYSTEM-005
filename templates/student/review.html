@@ -1,14 +1,14 @@
 {% extends "base.html" %}
 
-{% block title %}Review {{ lecturer.name }} - Lecturer Review System{% endblock %}
+{% block title %}{{ _('Review %(name)s - Lecturer Review System', name=lecturer.name) }}{% endblock %}
 
 {% block content %}
 <div class="main-content">
     <div class="card">
-        <a href="{{ url_for('index') }}" class="text-muted" style="font-size: 0.9rem;">&larr; Back to Lecturers</a>
+        <a href="{{ url_for('index') }}" class="text-muted" style="font-size: 0.9rem;">&larr; {{ _('Back to Lecturers') }}</a>
 
         <div class="profile-section mt-2">
-            <div class="profile-avatar">{{ lecturer.name[0] }}</div>
+            <div class="profile-avatar" aria-hidden="true">{{ lecturer.name[0] }}</div>
             <div class="profile-info">
                 <h3>{{ lecturer.name }}</h3>
                 <p>{{ lecturer.department }}</p>
@@ -16,9 +16,9 @@
         </div>
 
         {% if not session.get('is_student') %}
-        <div class="flash flash-warning" style="margin-bottom: 1rem;">
-            You must be logged in to submit a review.
-            <a href="{{ url_for('student_login', next=request.path) }}" style="font-weight: 600;">Log in here</a>
+        <div class="flash flash-warning" style="margin-bottom: 1rem;" role="alert">
+            {{ _('You must be logged in to submit a review.') }}
+            <a href="{{ url_for('student_login', next=request.path) }}" style="font-weight: 600;">{{ _('Log in here') }}</a>
         </div>
         {% endif %}
 
@@ -26,61 +26,98 @@
             <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
 
             <div class="form-group">
-                <label for="clarity">Clarity of Teaching (1-5)</label>
+                <label for="clarity">{{ _('Clarity of Teaching (1-5)') }}</label>
                 <select id="clarity" name="clarity" class="form-control" required>
-                    <option value="">Select rating</option>
-                    <option value="5">5 - Excellent</option>
-                    <option value="4">4 - Very Good</option>
-                    <option value="3">3 - Good</option>
-                    <option value="2">2 - Fair</option>
-                    <option value="1">1 - Poor</option>
+                    <option value="">{{ _('Select rating') }}</option>
+                    <option value="5">5 - {{ _('Excellent') }}</option>
+                    <option value="4">4 - {{ _('Very Good') }}</option>
+                    <option value="3">3 - {{ _('Good') }}</option>
+                    <option value="2">2 - {{ _('Fair') }}</option>
+                    <option value="1">1 - {{ _('Poor') }}</option>
                 </select>
             </div>
 
             <div class="form-group">
-                <label for="engagement">Student Engagement (1-5)</label>
+                <label for="engagement">{{ _('Student Engagement (1-5)') }}</label>
                 <select id="engagement" name="engagement" class="form-control" required>
-                    <option value="">Select rating</option>
-                    <option value="5">5 - Excellent</option>
-                    <option value="4">4 - Very Good</option>
-                    <option value="3">3 - Good</option>
-                    <option value="2">2 - Fair</option>
-                    <option value="1">1 - Poor</option>
+                    <option value="">{{ _('Select rating') }}</option>
+                    <option value="5">5 - {{ _('Excellent') }}</option>
+                    <option value="4">4 - {{ _('Very Good') }}</option>
+                    <option value="3">3 - {{ _('Good') }}</option>
+                    <option value="2">2 - {{ _('Fair') }}</option>
+                    <option value="1">1 - {{ _('Poor') }}</option>
                 </select>
             </div>
 
             <div class="form-group">
-                <label for="punctuality">Punctuality (1-5)</label>
+                <label for="punctuality">{{ _('Punctuality (1-5)') }}</label>
                 <select id="punctuality" name="punctuality" class="form-control" required>
-                    <option value="">Select rating</option>
-                    <option value="5">5 - Excellent</option>
-                    <option value="4">4 - Very Good</option>
-                    <option value="3">3 - Good</option>
-                    <option value="2">2 - Fair</option>
-                    <option value="1">1 - Poor</option>
+                    <option value="">{{ _('Select rating') }}</option>
+                    <option value="5">5 - {{ _('Excellent') }}</option>
+                    <option value="4">4 - {{ _('Very Good') }}</option>
+                    <option value="3">3 - {{ _('Good') }}</option>
+                    <option value="2">2 - {{ _('Fair') }}</option>
+                    <option value="1">1 - {{ _('Poor') }}</option>
                 </select>
             </div>
 
-            <div class="form-group">
-                <label>Overall Rating</label>
-                <div class="star-rating" id="rating-stars">
+            <div class="form-group overall-rating-preview" role="group" aria-label="{{ _('Overall rating preview') }}">
+                <div class="rating-preview-header">
+                    <span id="rating-label">{{ _('Overall Rating') }}</span>
+                    <span class="rating-preview-value" id="rating-value">-</span>
+                </div>
+                <div class="star-rating" id="rating-stars" aria-hidden="true">
                     <span class="star" data-value="1">&#9733;</span>
                     <span class="star" data-value="2">&#9733;</span>
                     <span class="star" data-value="3">&#9733;</span>
                     <span class="star" data-value="4">&#9733;</span>
                     <span class="star" data-value="5">&#9733;</span>
                 </div>
-                <input type="hidden" id="rating" name="rating" required>
+                <small class="text-muted">{{ _('Auto-calculated from your ratings above') }}</small>
             </div>
 
             <div class="form-group">
-                <label for="comment">Comments (optional)</label>
+                <label for="comment">{{ _('Comments (optional)') }}</label>
                 <textarea id="comment" name="comment" class="form-control" rows="4"
-                          placeholder="Share your feedback about this lecturer..."></textarea>
+                          placeholder="{{ _('Share your feedback about this lecturer...') }}"></textarea>
             </div>
 
-            <button type="submit" class="btn btn-primary">Submit Review</button>
+            <button type="submit" class="btn btn-primary">{{ _('Submit Review') }}</button>
         </form>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script nonce="{{ csp_nonce }}">
+(function() {
+    var clarity = document.getElementById('clarity');
+    var engagement = document.getElementById('engagement');
+    var punctuality = document.getElementById('punctuality');
+    var stars = document.querySelectorAll('#rating-stars .star');
+    var ratingValue = document.getElementById('rating-value');
+
+    function updateOverall() {
+        var c = parseInt(clarity.value) || 0;
+        var e = parseInt(engagement.value) || 0;
+        var p = parseInt(punctuality.value) || 0;
+        if (c && e && p) {
+            var avg = ((c + e + p) / 3).toFixed(1);
+            var rounded = Math.round(c + e + p / 3);
+            ratingValue.textContent = avg;
+            stars.forEach(function(s) {
+                var val = parseInt(s.getAttribute('data-value'));
+                s.classList.toggle('selected', val <= rounded);
+            });
+        } else {
+            ratingValue.textContent = '-';
+            stars.forEach(function(s) { s.classList.remove('selected'); });
+        }
+    }
+
+    clarity.addEventListener('change', updateOverall);
+    engagement.addEventListener('change', updateOverall);
+    punctuality.addEventListener('change', updateOverall);
+})();
+</script>
 {% endblock %}

@@ -1,41 +1,93 @@
 {% extends "base.html" %}
 
-{% block title %}Home - Lecturer Review System{% endblock %}
+{% block title %}{{ _('Home - Lecturer Review System') }}{% endblock %}
 
 {% block content %}
 <div class="main-content">
+    <!-- Hero Section -->
+    {% if not session.get('is_student') and not session.get('is_lecturer') and not session.get('is_admin') %}
+    <section class="hero-section">
+        <div class="hero-content">
+            <h1 class="hero-title">{{ _('University Lecturer Review System') }}</h1>
+            <p class="hero-subtitle">{{ _('Help us improve teaching quality by sharing your honest feedback') }}</p>
+            <div class="hero-actions">
+                <a href="{{ url_for('student_register') }}" class="btn btn-primary btn-lg">{{ _('Get Started') }}</a>
+                <a href="{{ url_for('student_login') }}" class="btn btn-outline btn-lg">{{ _('Log In') }}</a>
+            </div>
+            <div class="hero-stats">
+                <div class="hero-stat">
+                    <span class="hero-stat-value">{{ lecturers|length }}</span>
+                    <span class="hero-stat-label">{{ _('Lecturers') }}</span>
+                </div>
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
+    <!-- Search & Lecturers -->
     <div class="card">
         <div class="card-header">
             <div>
-                <h2>University Lecturer Review System</h2>
-                <p class="text-muted">Select a lecturer to submit your review</p>
+                <h2>{{ _('Lecturers') }}</h2>
+                <p class="text-muted">{{ _('Select a lecturer to submit your review') }}</p>
             </div>
         </div>
 
+        <!-- Search Bar -->
+        <form method="get" action="{{ url_for('index') }}" class="search-bar">
+            <label for="search" class="visually-hidden">{{ _('Search lecturers') }}</label>
+            <input type="text" id="search" name="search" value="{{ search }}" class="form-control"
+                   placeholder="{{ _('Search by name or department...') }}">
+            <button type="submit" class="btn btn-primary">{{ _('Search') }}</button>
+            {% if search %}
+            <a href="{{ url_for('index') }}" class="btn btn-outline">{{ _('Clear') }}</a>
+            {% endif %}
+        </form>
+
         {% if lecturers %}
         <div class="lecturer-grid">
-            {% for lecturer in lecturers %}
+            {% for lecturer, num_reviews, avg_rating in lecturers %}
             <div class="lecturer-card">
                 <div class="profile-section">
-                    <div class="profile-avatar">{{ lecturer.name[0] }}</div>
+                    <div class="profile-avatar" aria-hidden="true">{{ lecturer.name[0] }}</div>
                     <div class="profile-info">
                         <h4>{{ lecturer.name }}</h4>
                         <p>{{ lecturer.department }}</p>
                     </div>
                 </div>
+                <div class="lecturer-card-stats">
+                    <div class="lecturer-rating-display">
+                        {% if avg_rating %}
+                        <span class="rating-number">{{ avg_rating }}</span>
+                        <span class="rating-stars" aria-label="{{ _('Rating: %(rating)s out of 5', rating=avg_rating) }}">
+                            {% for i in range(1, 6) %}
+                                {% if i <= avg_rating|round(0, 'floor')|int %}<span class="star filled">&#9733;</span>{% elif i - 0.5 <= avg_rating %}<span class="star half">&#9733;</span>{% else %}<span class="star empty">&#9733;</span>{% endif %}
+                            {% endfor %}
+                        </span>
+                        {% else %}
+                        <span class="text-muted">{{ _('No ratings yet') }}</span>
+                        {% endif %}
+                    </div>
+                    <span class="review-count">{{ _('(%(count)s reviews)', count=num_reviews) }}</span>
+                </div>
                 <a href="{{ url_for('review', lecturer_id=lecturer.id) }}" class="btn btn-primary">
-                    Review This Lecturer
+                    {{ _('Review This Lecturer') }}
                 </a>
             </div>
             {% endfor %}
         </div>
         {% else %}
         <div class="text-center" style="padding: 3rem 1rem;">
-            <p class="text-muted">No lecturers available for review at this time.</p>
+            {% if search %}
+            <p class="text-muted">{{ _('No lecturers found matching "%(search)s".', search=search) }}</p>
+            <a href="{{ url_for('index') }}" class="btn btn-outline mt-2">{{ _('Clear Search') }}</a>
+            {% else %}
+            <p class="text-muted">{{ _('No lecturers available for review at this time.') }}</p>
             {% if not session.get('is_student') %}
             <p class="mt-2">
-                <a href="{{ url_for('student_login') }}" class="btn btn-outline">Log in to get started</a>
+                <a href="{{ url_for('student_login') }}" class="btn btn-outline">{{ _('Log in to get started') }}</a>
             </p>
+            {% endif %}
             {% endif %}
         </div>
         {% endif %}
@@ -43,11 +95,28 @@
 
     {% if not session.get('is_student') and not session.get('is_lecturer') and not session.get('is_admin') %}
     <div class="card">
-        <h3 class="mb-2">Get Started</h3>
-        <div style="display: flex; flex-wrap: wrap; gap: 0.75rem;">
-            <a href="{{ url_for('student_register') }}" class="btn btn-primary">Register as Student</a>
-            <a href="{{ url_for('student_login') }}" class="btn btn-outline">Student Login</a>
-            <a href="{{ url_for('lecturer_login') }}" class="btn btn-outline">Lecturer Login</a>
+        <h3 class="mb-2">{{ _('How It Works') }}</h3>
+        <div class="how-it-works">
+            <div class="hiw-step">
+                <div class="hiw-icon">1</div>
+                <h4>{{ _('Register') }}</h4>
+                <p>{{ _('Create a student account with your university ID') }}</p>
+            </div>
+            <div class="hiw-step">
+                <div class="hiw-icon">2</div>
+                <h4>{{ _('Choose') }}</h4>
+                <p>{{ _('Select a lecturer you want to review') }}</p>
+            </div>
+            <div class="hiw-step">
+                <div class="hiw-icon">3</div>
+                <h4>{{ _('Review') }}</h4>
+                <p>{{ _('Rate clarity, engagement, and punctuality') }}</p>
+            </div>
+            <div class="hiw-step">
+                <div class="hiw-icon">4</div>
+                <h4>{{ _('Impact') }}</h4>
+                <p>{{ _('Your feedback helps improve teaching quality') }}</p>
+            </div>
         </div>
     </div>
     {% endif %}

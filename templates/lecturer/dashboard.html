@@ -1,44 +1,73 @@
 {% extends "base.html" %}
 
-{% block title %}Lecturer Dashboard - Lecturer Review System{% endblock %}
+{% block title %}{{ _('Lecturer Dashboard - Lecturer Review System') }}{% endblock %}
 
 {% block content %}
 <div class="main-content">
     <div class="card">
         <div class="profile-section">
-            <div class="profile-avatar">{{ lecturer.name[0] }}</div>
+            <div class="profile-avatar" aria-hidden="true">{{ lecturer.name[0] }}</div>
             <div class="profile-info">
-                <h3>Welcome, {{ lecturer.name }}</h3>
+                <h3>{{ _('Welcome, %(name)s', name=lecturer.name) }}</h3>
                 <p>{{ lecturer.department }}</p>
             </div>
         </div>
     </div>
 
+    <p class="text-muted" style="margin-bottom: 1rem;">
+        {{ _('Student identities remain anonymous in all performance reviews.') }}
+    </p>
+
     <div class="stats-grid">
         <div class="stat-card">
             <div class="stat-value">{{ stats.num_reviews or 0 }}</div>
-            <div class="stat-label">Total Reviews</div>
+            <div class="stat-label">{{ _('Total Reviews') }}</div>
         </div>
         <div class="stat-card">
             <div class="stat-value">{{ stats.avg_overall or 'N/A' }}</div>
-            <div class="stat-label">Overall Rating</div>
+            <div class="stat-label">{{ _('Overall Rating') }}</div>
         </div>
         <div class="stat-card">
             <div class="stat-value">{{ stats.avg_clarity or 'N/A' }}</div>
-            <div class="stat-label">Avg Clarity</div>
+            <div class="stat-label">{{ _('Avg Clarity') }}</div>
         </div>
         <div class="stat-card">
             <div class="stat-value">{{ stats.avg_engagement or 'N/A' }}</div>
-            <div class="stat-label">Avg Engagement</div>
+            <div class="stat-label">{{ _('Avg Engagement') }}</div>
         </div>
     </div>
 
+    <!-- Rating Distribution Charts -->
+    {% if stats.num_reviews and stats.num_reviews > 0 %}
+    <div class="card">
+        <h3 class="mb-2">{{ _('Rating Distribution') }}</h3>
+        <div class="rating-charts">
+            {% for category, label in [('clarity', _('Clarity')), ('engagement', _('Engagement')), ('punctuality', _('Punctuality'))] %}
+            <div class="rating-chart">
+                <h4 class="rating-chart-title">{{ label }}</h4>
+                <div class="bar-chart">
+                    {% for rating_val in range(5, 0, -1) %}
+                    {% set count = rating_dist[category][rating_val] %}
+                    {% set max_count = rating_dist[category].values()|max if rating_dist[category].values()|max > 0 else 1 %}
+                    {% set pct = (count / max_count * 100)|round(0, 'floor')|int if max_count > 0 else 0 %}
+                    <div class="bar-row">
+                        <span class="bar-label">{{ rating_val }}</span>
+                        <div class="bar-track">
+                            <div class="bar-fill" style="width: {{ pct }}%;"></div>
+                        </div>
+                        <span class="bar-count">{{ count }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
     <div class="card">
         <div class="card-header">
-            <h3>Performance Reviews & Feedback</h3>
-            <a href="{{ url_for('export_reviews_by_lecturer', lecturer_id=lecturer.id) }}" class="btn btn-outline btn-sm">
-                Download CSV
-            </a>
+            <h3>{{ _('Performance Reviews & Feedback') }}</h3>
         </div>
 
         {% if reviews %}
@@ -46,20 +75,20 @@
             <table>
                 <thead>
                     <tr>
-                        <th>Date</th>
-                        <th>Clarity</th>
-                        <th>Engagement</th>
-                        <th>Punctuality</th>
-                        <th>Comment</th>
+                        <th scope="col">{{ _('Date') }}</th>
+                        <th scope="col">{{ _('Clarity') }}</th>
+                        <th scope="col">{{ _('Engagement') }}</th>
+                        <th scope="col">{{ _('Punctuality') }}</th>
+                        <th scope="col">{{ _('Comment') }}</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for review in reviews %}
                     <tr>
-                        <td style="white-space: nowrap;">{{ review.created_at[:10] }}</td>
-                        <td>{{ review.clarity }}/5</td>
-                        <td>{{ review.engagement }}/5</td>
-                        <td>{{ review.punctuality }}/5</td>
+                        <td style="white-space: nowrap;">{{ review.created_at.strftime('%Y-%m-%d') if review.created_at else '-' }}</td>
+                        <td><span class="rating-badge rating-{{ review.clarity }}">{{ review.clarity }}/5</span></td>
+                        <td><span class="rating-badge rating-{{ review.engagement }}">{{ review.engagement }}/5</span></td>
+                        <td><span class="rating-badge rating-{{ review.punctuality }}">{{ review.punctuality }}/5</span></td>
                         <td>{{ review.comment or '-' }}</td>
                     </tr>
                     {% endfor %}
@@ -67,7 +96,7 @@
             </table>
         </div>
         {% else %}
-        <p class="text-muted text-center" style="padding: 2rem;">No reviews yet. Students will appear here once they submit feedback.</p>
+        <p class="text-muted text-center" style="padding: 2rem;">{{ _('No reviews yet. Students will appear here once they submit feedback.') }}</p>
         {% endif %}
     </div>
 </div>
